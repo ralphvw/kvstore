@@ -7,6 +7,9 @@ fn main() {
 
     let contents = format!("{}\t{}\n", key, value);
     std::fs::write("kv.db", contents).unwrap();
+
+    let mut db = Database::new().unwrap();
+    db.insert(key, value);
 }
 
 struct Database {
@@ -23,5 +26,9 @@ impl Database {
             map.insert(key.to_owned(), value.to_owned());
         }
         Ok(Database { map })
+    }
+
+    fn insert(&mut self, key: String, value: String) {
+        self.map.insert(key, value);
     }
 }
