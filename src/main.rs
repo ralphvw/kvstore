@@ -5,11 +5,9 @@ fn main() {
     let key = args.next().expect("Please enter a key");
     let value = args.next().expect("Please enter a value");
 
-    let contents = format!("{}\t{}\n", key, value);
-    std::fs::write("kv.db", contents).unwrap();
-
     let mut db = Database::new().unwrap();
     db.insert(key, value);
+    db.flush().unwrap();
 }
 
 struct Database {
@@ -30,5 +28,13 @@ impl Database {
 
     fn insert(&mut self, key: String, value: String) {
         self.map.insert(key, value);
+    }
+
+    fn flush(self) -> Result<(), std::io::Error> {
+        let mut contents = String::new();
+        for (key, value) in &self.map {
+            contents.push_str(&format!("{}\t{}\n", key, value));
+        }
+        std::fs::write("kv.db", contents)
     }
 }
