@@ -7,7 +7,6 @@ fn main() {
 
     let mut db = Database::new().unwrap();
     db.insert(key, value);
-    db.flush().unwrap();
 }
 
 struct Database {
@@ -30,11 +29,17 @@ impl Database {
         self.map.insert(key, value);
     }
 
-    fn flush(self) -> Result<(), std::io::Error> {
+    fn flush(&self) -> Result<(), std::io::Error> {
         let mut contents = String::new();
         for (key, value) in &self.map {
             contents.push_str(&format!("{}\t{}\n", key, value));
         }
         std::fs::write("kv.db", contents)
+    }
+}
+
+impl Drop for Database {
+    fn drop(&mut self) {
+        let _ = self.flush();
     }
 }
